@@ -22,7 +22,8 @@ Melody RNN
 - Basic_RNN, Mono_RNN, Attention_RNN
 - Attention_RNN : 모델이 해당 정보를 RNN 셀의 상태에 저장할 필요 없이 과거 정보에 더 쉽게 액세스 할 수 있습니다.
 이를 통해 모델은 장기적인 종속성을 더 쉽게 학습할 수 있으며 결과적으로 더 긴 아치형 테마가 있는 멜로디가 생성됩니다.
-    ### :wrench: 시스템 구조
+     
+### :wrench: 시스템 구조
 ---
 ![image](https://user-images.githubusercontent.com/26815767/143527769-4ad121e0-92fc-4254-a818-6d0580c14f8a.png)
 
