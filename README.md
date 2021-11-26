@@ -8,3 +8,7 @@ GPT2와 마젠타를 사용한 작곡 작사 프로젝트
 
 ### Magenta
 - Tensorflow에서 제공하는 
+
+
+### 시스템 구조
+![image](https://user-images.githubusercontent.com/26815767/143527769-4ad121e0-92fc-4254-a818-6d0580c14f8a.png)
