@@ -1,8 +1,5 @@
 # AIDOL_project
-GPT2와 마젠타를 사용한 작곡 작사 프로젝트
 
-### :pushpin: 프로젝트 목적
----
 ### 실감형 메타버스 콘서트를 위한 캐릭터 분석 기반 인공지능 작사, 작곡
 
 ![image](https://user-images.githubusercontent.com/26815767/143536030-24c2535d-3078-4c06-b55b-724ea55bdcee.png)
