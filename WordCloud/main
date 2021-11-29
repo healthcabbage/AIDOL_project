@@ -1,0 +1,85 @@
+def path_find():
+    filename = filedialog.askopenfilename(initialdir = "/",
+                                          title = "Select a File",
+                                          filetypes = (("excel files",
+                                                        "*.xlsx*"),
+                                                       ("all files",
+                                                        "*.*")))
+      
+    global path
+    path = str(filename)
+    
+def mask_path_find():
+    filename = filedialog.askopenfilename(initialdir = "/",
+                                          title = "Select a File",
+                                          filetypes = (("png files",
+                                                        "*.png*"),
+                                                       ("all files",
+                                                        "*.*")))
+      
+    global mask_path
+    mask_path = str(filename)
+
+#print(path)
+
+def make_cloud():
+    try:
+        tokenizer = Okt()
+        print("워드클라우드 함수 진입")
+        print(path)
+
+        music_b = pd.read_excel(path, engine='openpyxl')
+        lyrics_Ballade = music_b[:]['가사']
+
+        # 가사 형태소 기준으로 토크나이징, 명사 형용사 부사만 추출
+        morph_Ballade = []
+        tmp_Ballade = []
+
+        #발라드 불러오기
+        for lyric in lyrics_Ballade:
+            tmp = tokenizer.pos(lyric)
+            tmp_Ballade.append(tmp)
+
+        for i in tmp_Ballade:
+          for word, tag in i:
+            if tag in ['Noun', 'Adjective', 'Adverb'] and ("것" not in word) and ("수" not in word) and ("게" not in word):
+              if len(word)>1:
+                    morph_Ballade.append(word)
+
+        #morph_Ballade = list(filter(lambda x: x not in ['사랑'], morph_Ballade))
+
+        count_b = Counter(morph_Ballade)
+
+        #빈도수 확인
+        noun_list = count_b.most_common(10)
+        print(noun_list)#빈도수
+
+        #morph_Ballade = set(morph_Ballade)    
+        #print("발견 된 명사의 갯수(중복제거): " + str(len(setdata)))
+
+        morph_Ballade = ' '.join(morph_Ballade)
+        # word cloud 생성, 마스크 지정
+        if(mask_path):
+            print("이쓰")
+            cloud_mask = np.array(Image.open(mask_path))#클라우드 마스크
+            wordcloud_Ballade = WordCloud(max_words=150, font_path='./dataset/NanumBarunpenR.ttf', max_font_size=40, background_color='white', mask = cloud_mask).generate(morph_Ballade)
+        
+        global cloud_img 
+        cloud_img = wordcloud_Ballade
+        plt.figure(figsize=(8, 8))
+        plt.imshow(wordcloud_Ballade)
+
+        #wordcloud_Ballade = wordcloud_Ballade.generate(lyrics_Ballade)
+        wordcloud_Ballade.to_file("dataset/wordcloud.png")
+        
+        #plt.imshow(cloud_mask)
+        plt.axis('off')
+        plt.show()
+        st.insert(1.0, noun_list)
+        #canvas.itemconfig(image=img2)
+
+    except:
+        st.insert(1.0, "오류 발생")
+        print("오류")
+        return
+
