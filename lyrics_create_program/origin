@@ -1,0 +1,80 @@
+//모델 학습
+from transformers import TextDataset, DataCollatorForLanguageModeling
+from transformers import GPT2LMHeadModel
+from transformers import Trainer, TrainingArguments
+from transformers import PreTrainedTokenizerFast
+
+def load_dataset(file_path, tokenizer, block_size = 128):
+    dataset = TextDataset(
+        tokenizer = tokenizer,
+        file_path = file_path,
+        block_size = block_size,
+    )
+    return dataset
+    
+def load_data_collator(tokenizer, mlm = False):
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer = tokenizer,
+    mlm = mlm,
+)
+return data_collator
+    
+def train(train_file_path, model_name,
+    output_dir,
+     overwrite_output_dir,
+     per_device_train_batch_size,
+     num_train_epochs,
+     save_steps):
+tokenizer = PreTrainedTokenizerFast.from_pretrained(model_name,
+                bos_token='</s>', eos_token='</s>', unk_token='<unk>',
+                pad_token='<pad>', mask_token='<mask>')
+train_dataset = load_dataset(train_file_path, tokenizer)
+data_collator = load_data_collator(tokenizer)
+tokenizer.save_pretrained(output_dir, legacy_format=False)
+model = GPT2LMHeadModel.from_pretrained(model_name)
+model.save_pretrained(output_dir)
+training_args = TrainingArguments(
+                output_dir=output_dir,
+                overwrite_output_dir=overwrite_output_dir,
+                per_device_train_batch_size=per_device_train_batch_size,
+                num_train_epochs=num_train_epochs,
+)
+trainer = Trainer(
+            model=model,
+            args=training_args,
+            data_collator=data_collator,
+            train_dataset=train_dataset,
+)
+trainer.train()
+trainer.save_model()
+    
+train_file_path = 'C:/dataset/Ending_1.txt'
+model_name = 'skt/kogpt2-base-v2'
+output_dir = './Ending_1_model'
+overwrite_output_dir = False
+per_device_train_batch_size = 8
+num_train_epochs = 15
+save_steps = 500
+
+//가사 생성
+def generate_text(sequence, max_length):
+    model_path = "./"
+    model = load_model(model_path)
+    tokenizer = load_tokenizer(model_path)
+    ids = tokenizer.encode(f'{sequence},', return_tensors='pt')
+    final_outputs = model.generate(
+        ids,
+        max_length=max_length,
+        ...
+    )
+    
+input = '퇴근'
+
+sequence = input
+max_len = 75
+
+print('input : ' + sequence)
+
+for i in range(10):
+    print(generate_text(sequence, max_len))
+    print('=' * 30)
