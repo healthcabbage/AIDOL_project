@@ -1,0 +1,265 @@
+root = tk.Tk()
+root.title("AI 가사 생성")
+root.geometry("520x900")
+root.resizable(False, False)
+
+title = tk.Label(root, text="AI 가사 생성 시스템", font="helvetica 20")
+title.place(x=130, y=0)
+
+def about():
+    label = messagebox.showinfo("도움말", "키워드 : 생성하고 싶은 가사에 대한 단어 입력\n\n가사최대길이 : 생성하고 싶은 가사 길이\n\n가사생성갯수 : 생성할 가사의 개수 입력\n\ntop-k : 단어의 범위를 정하는 데이터 값입니다.\n\ntop-p : 누적 확률을 설정합니다, top-k의 단어에서 누적 확률에 다다르는 최소한의 단어를 설정합니다.\n\ntemperature : 문장의 부자연스러움을 잡기 위한 설정값입니다. \n\nrepetition_penalty : 반복 패널티에 대한 값입니다. 1.0은 패널티가 없음을 의미합니다.\n\n모델 선택 : 가사를 생성하고 싶은 계열의 모델을 선택합니다.\n\n가사 생성 : 설정 값을 전부 선택하게 되면, 가사를 생성해줍니다.\n\n가사 저장 : 생성된 가사를 텍스트 파일로 저장합니다.\n\n")
+   
+menu = Menu(root)
+root.config(menu=menu)
+helpmenu = Menu(menu)
+menu.add_cascade(label="도움말", menu=helpmenu)
+helpmenu.add_command(label="사용방법", command=about)
+
+k1 = tk.Label(root, text="키워드")
+l2 = tk.Label(root, text="가사최대길이")
+l3 = tk.Label(root, text="가사생성갯수")
+t4 = tk.Label(root, text="top-k")
+k1.place(x=125, y=50)
+l2.place(x=125, y=80)
+l3.place(x=125, y=110)
+t4.place(x=125, y=140)
+
+e1 = Entry(root)
+e2 = Entry(root)
+e3 = Entry(root)
+e4 = Entry(root)
+e1.place(x=250, y=50)
+e2.place(x=250, y=80)
+e3.place(x=250, y=110)
+e4.place(x=250, y=140)
+
+#top-p
+# slider current value
+current_value_p = tk.DoubleVar()
+
+def get_current_value_p():
+    return '{: .2f}'.format(current_value_p.get())
+
+
+def slider_changed_p(event):
+    value_label_p.configure(text=get_current_value_p())
+
+
+# label for the slider
+slider_label = ttk.Label(
+    root,
+    text='top-p'
+)
+
+slider_label.place(
+    x=125,
+    y=170
+)
+
+#  slider
+slider_p = ttk.Scale(
+    root,
+    from_=0,
+    to=1,
+    orient='horizontal',  # vertical
+    command=slider_changed_p,
+    variable=current_value_p
+)
+
+slider_p.place(
+    x=295,
+    y=160
+)
+
+
+# value label
+value_label_p = ttk.Label(
+    root,
+    text=get_current_value_p()
+)
+value_label_p.place(
+    x=243,
+    y=170
+)
+
+#temperature -slide
+# slider current value
+current_value_t = tk.DoubleVar()
+
+
+def get_current_value_t():
+    return '{: .1f}'.format(current_value_t.get())
+
+
+def slider_changed_t(event):
+    value_label_t.configure(text=get_current_value_t())
+
+
+# label for the slider
+slider_label = ttk.Label(
+    root,
+    text='temperature'
+)
+
+slider_label.place(
+    x=125,
+    y=200
+)
+
+#  slider
+slider_t = ttk.Scale(
+    root,
+    from_=0,
+    to=1,
+    orient='horizontal',  # vertical
+    command=slider_changed_t,
+    variable=current_value_t
+)
+
+slider_t.place(
+    x=295,
+    y=195
+)
+# value label
+value_label_t = ttk.Label(
+    root,
+    text=get_current_value_t()
+)
+value_label_t.place(
+    x=243,
+    y=200
+)
+
+#repetition_penalty - slide
+#slider current value
+current_value_r = tk.DoubleVar()
+
+
+def get_current_value_r():
+    return '{: .1f}'.format(current_value_r.get())
+
+
+def slider_changed_r(event):
+    value_label_r.configure(text=get_current_value_r())
+
+
+# label for the slider
+slider_label = ttk.Label(
+    root,
+    text='repetition_penalty:'
+)
+
+slider_label.place(
+    x=125,
+    y=230
+)
+
+#  slider
+slider_r = ttk.Scale(
+    root,
+    from_=0,
+    to=1,
+    orient='horizontal',  # vertical
+    command=slider_changed_r,
+    variable=current_value_r
+)
+
+slider_r.place(
+    x=295,
+    y=230
+)
+# value label
+value_label_r = ttk.Label(
+    root,
+    text=get_current_value_r()
+)
+value_label_r.place(
+    x=243,
+    y=230
+)
+
+#lyrics - scrolled text
+ly1 = tk.Label(root, text="가사")
+ly1.place(x=250, y=325)
+
+st = ScrolledText(root, width=40,  height=30)
+st.config(wrap=WORD)
+#st.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+st.place(x=125, y=355)
+
+def callback():
+    l4.configure(text=cmb.get())
+
+course = ["윈디", "스노", "버니", "엔딩1(서정적)", "엔딩2(우울한)", "엔딩3(신나는)", "엔딩4(차분함)"]
+
+cmb = ttk.Combobox(root, values=course, width = 25)
+cmb.place(x=125, y=265)
+cmb.current(0)
+
+def select_model(sequence, max_length):
+    global selectmodel
+    if cmb.get() == "윈디":
+        selectmodel = ""
+    elif cmb.get() == "스노":
+        selectmodel = ""
+    elif cmb.get() == "버니":
+        selectmodel = ""
+    elif cmb.get() == "엔딩1(서정적)":
+        selectmodel = ""
+    elif cmb.get() == "엔딩2(우울한)":
+        selectmodel = ""
+    elif cmb.get() == "엔딩3(신나는)":
+        selectmodel = ""
+    elif cmb.get() == "엔딩4(차분함)":
+        selectmodel = ""
+    
+    from transformers import PreTrainedTokenizerFast, GPT2LMHeadModel
+    def load_model(model_path):
+        model = GPT2LMHeadModel.from_pretrained(model_path)
+        return model
+    def load_tokenizer(tokenizer_path):
+        tokenizer = PreTrainedTokenizerFast.from_pretrained(tokenizer_path)
+        return tokenizer
+    model_path = "./" + selectmodel
+    model = load_model(model_path)
+    tokenizer = load_tokenizer(model_path)
+    ids = tokenizer.encode(f'{sequence},', return_tensors='pt')
+    final_outputs = model.generate(
+        ids,
+        max_length=max_length,
+        ...
+)
+    #print(tokenizer.decode(final_outputs[0], skip_special_tokens=True))
+    st.insert('end',str(tokenizer.decode(final_outputs[0], skip_special_tokens=True)))
+
+def make_lyrics():
+    sequence = e1.get()
+    max_len = int(e2.get())
+    max_song = int(e3.get())
+    st.delete('1.0', END)
+
+    for i in range(max_song):
+        length_text = (str(i+1) + "번째 곡 \n")
+        st.insert('end', length_text)
+        select_model(sequence, max_len)
+        st.insert(tk.INSERT, "\n\n") 
+
+def save_song():
+    f = asksaveasfile(mode = "w", defaultextension=".txt")
+    if f is None:
+        return
+    ts = str(st.get(1.0, END))
+    f.write(ts)
+    f.close()
+ 
+#button - 모델 선택 리스트 박스?, 가사 생성, 종료
+b1 = Button(root, text="모델 선택", command=select_model) 
+b2 = Button(root, text="가사 생성",command=make_lyrics)
+b3 = Button(root, text="가사 저장", command=save_song)
+b4 = Button(root, text="종료",command=root.destroy)
+b1.place(x=340, y=262)
+b2.place(x=200, y=295)
+b3.place(x=270, y=295)
+b4.place(x=255, y=760)
+
+root.mainloop()
